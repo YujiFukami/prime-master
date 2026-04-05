@@ -1128,8 +1128,9 @@ body { position: relative; }
 }
 .footer-link:hover { opacity: 0.75; }
 .footer-logo {
-  height: 18px;
-  width: auto;
+  width: 320px;
+  max-width: 90vw;
+  height: auto;
   display: block;
   filter: grayscale(1) brightness(2);
 }
