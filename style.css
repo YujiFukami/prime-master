@@ -1072,3 +1072,65 @@ body { position: relative; }
   width: 100%;
 }
 
+/* ===================================================
+   X（Twitter）シェアボタン
+=================================================== */
+.btn-x-share {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  padding: 13px 20px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-xl);
+  background: #000;
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+.btn-x-share:hover {
+  background: #1a1a1a;
+  border-color: rgba(255,255,255,0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+.btn-x-share:active { transform: translateY(0); }
+
+.x-logo {
+  width: 16px;
+  height: 16px;
+  fill: #fff;
+  flex-shrink: 0;
+}
+
+/* ===================================================
+   グローバルフッター（全画面共通・固定）
+=================================================== */
+.global-footer {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: all;
+}
+.footer-link {
+  display: block;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+}
+.footer-link:hover { opacity: 0.75; }
+.footer-logo {
+  height: 18px;
+  width: auto;
+  display: block;
+  filter: grayscale(1) brightness(2);
+}
+

@@ -314,6 +314,12 @@ function initHome() {
     renderPrimeList(2);
     showScreen('primelist');
   });
+
+  // X シェアボタン（ホーム宣伝用）
+  document.getElementById('btn-share-home').addEventListener('click', () => {
+    SFX.click();
+    shareToX_promo();
+  });
 }
 
 // ===================================================
@@ -710,6 +716,10 @@ function initResult() {
       SFX.register();
       showScreen('ranking');
       await renderRankingScreen(state.difficulty, 'week', rank);
+      // ランクイン報告用Xボタンを表示
+      const shareBtn = document.getElementById('btn-share-ranking');
+      if (shareBtn) shareBtn.style.display = '';
+
     } catch (e) {
       // 通信エラー時はフォールバックメッセージ
       btn.disabled = false;
@@ -763,6 +773,12 @@ function initRanking() {
   document.getElementById('btn-home-ranking').addEventListener('click', () => {
     SFX.click();
     showScreen('home');
+  });
+
+  // X シェアボタン（ランクイン報告用）— ランキング登録後に show() される
+  document.getElementById('btn-share-ranking').addEventListener('click', () => {
+    SFX.click();
+    shareToX_rankin();
   });
 }
 
@@ -824,6 +840,43 @@ function initGameButtons() {
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') handleAnswer(true);
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') handleAnswer(false);
   });
+}
+
+// ===================================================
+// X（Twitter）シェア関数
+// ===================================================
+const APP_URL = 'https://prime-master.onrender.com/';
+
+/** ホーム画面 — 宣伝ポスト */
+function shareToX_promo() {
+  const text = [
+    '🧮✨ 素数マスターで素数力を試そう！',
+    '60秒タイムアタックで何問正解できる？',
+    '難易度は2桁〜4桁の3段階！',
+    '#素数マスター #PrimeMaster #数学ゲーム',
+    APP_URL,
+  ].join('\n');
+  openXPost(text);
+}
+
+/** ランキング登録後 — ランクイン報告ポスト */
+function shareToX_rankin() {
+  const diff   = DIFFICULTY_CONFIG[state.difficulty]?.label ?? '';
+  const rank   = state.myScoreIndex >= 0 ? `${state.myScoreIndex + 1}位` : 'ランクイン';
+  const score  = state.penaltyScore;
+  const text = [
+    `🏆 素数マスター：${diff}難易度で${rank}！`,
+    `スコア：${score}pt（正解数−不正解数）`,
+    '#素数マスター #PrimeMaster',
+    APP_URL,
+  ].join('\n');
+  openXPost(text);
+}
+
+/** X投稿ウィンドウを開く */
+function openXPost(text) {
+  const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
+  window.open(url, '_blank', 'noopener,noreferrer,width=600,height=500');
 }
 
 // ===================================================
