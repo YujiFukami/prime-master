@@ -1,39 +1,39 @@
 /* ===================================================
-   素数マスター — style.css
-   テーマ：宇宙・数学 / ダークモード
+   素数の達人 — style.css
+   テーマ：江戸和風 / 深藍ダークモード
 =================================================== */
 
 /* ---------- デザイントークン ---------- */
 :root {
-  --bg-deep:       #060818;
-  --bg-card:       rgba(255,255,255,0.05);
-  --bg-card-hover: rgba(255,255,255,0.09);
-  --border:        rgba(255,255,255,0.12);
-  --border-bright: rgba(255,255,255,0.25);
+  --bg-deep:       #09090f;
+  --bg-card:       rgba(245,234,208,0.04);
+  --bg-card-hover: rgba(245,234,208,0.08);
+  --border:        rgba(212,160,23,0.2);
+  --border-bright: rgba(212,160,23,0.5);
 
-  --accent-cyan:   #00e5ff;
-  --accent-purple: #b24bff;
-  --accent-gold:   #ffd600;
-  --correct-green: #00e676;
-  --wrong-red:     #ff1744;
+  --accent-cyan:   #d4a017;   /* 金色 */
+  --accent-purple: #bf3b29;   /* 朱色 */
+  --accent-gold:   #d4a017;
+  --correct-green: #5dbb6e;
+  --wrong-red:     #bf3b29;
 
-  --grad-main: linear-gradient(135deg, #0d0d2b 0%, #1a0538 50%, #0a1a3a 100%);
-  --grad-btn:  linear-gradient(135deg, #b24bff, #00e5ff);
-  --grad-easy: linear-gradient(135deg, #00e5ff, #0072ff);
-  --grad-norm: linear-gradient(135deg, #b24bff, #ff6ec7);
-  --grad-hard: linear-gradient(135deg, #ffd600, #ff6d00);
+  --grad-main: linear-gradient(160deg, #0d0b14 0%, #160c0a 50%, #0a0c14 100%);
+  --grad-btn:  linear-gradient(135deg, #bf3b29, #8b1e10);
+  --grad-easy: linear-gradient(135deg, #2a6b5e, #1a4a3e);
+  --grad-norm: linear-gradient(135deg, #6b3a9e, #4a2070);
+  --grad-hard: linear-gradient(135deg, #bf3b29, #8b1e10);
 
-  --font-main:  'Outfit', sans-serif;
-  --font-digit: 'Orbitron', monospace;
+  --font-main:  'Shippori Mincho', 'Noto Serif JP', serif;
+  --font-digit: 'Rampart One', 'Shippori Mincho', serif;
 
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
 
-  --shadow-glow-cyan:   0 0 24px rgba(0,229,255,0.4);
-  --shadow-glow-purple: 0 0 24px rgba(178,75,255,0.4);
-  --shadow-glow-gold:   0 0 24px rgba(255,214,0,0.5);
+  --shadow-glow-cyan:   0 0 28px rgba(212,160,23,0.45);
+  --shadow-glow-purple: 0 0 28px rgba(191,59,41,0.5);
+  --shadow-glow-gold:   0 0 28px rgba(212,160,23,0.5);
 
   --transition: 0.2s ease;
 }
@@ -45,11 +45,18 @@ html, body {
   height: 100%;
   font-family: var(--font-main);
   background: var(--bg-deep);
-  color: #e0e8ff;
+  color: #f5ead0;
   overflow: hidden;
 }
 
-body { position: relative; }
+body {
+  position: relative;
+  /* 麻の葉風の背景紋様（淡く） */
+  background-image:
+    repeating-linear-gradient(60deg,  rgba(212,160,23,0.025) 0px, rgba(212,160,23,0.025) 1px, transparent 1px, transparent 30px),
+    repeating-linear-gradient(120deg, rgba(212,160,23,0.025) 0px, rgba(212,160,23,0.025) 1px, transparent 1px, transparent 30px),
+    repeating-linear-gradient(0deg,   rgba(212,160,23,0.015) 0px, rgba(212,160,23,0.015) 1px, transparent 1px, transparent 30px);
+}
 
 /* ---------- 星背景 ---------- */
 #stars-container {
@@ -97,59 +104,58 @@ body { position: relative; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 32px;
+  gap: 28px;
   max-width: 540px;
   width: 100%;
-  padding: 40px 24px;
+  padding: 32px 24px 110px;
 }
 
 /* ロゴ */
 .logo-area { text-align: center; }
 .logo-icon {
   font-family: var(--font-digit);
-  font-size: clamp(48px, 10vw, 80px);
-  background: var(--grad-btn);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(178,75,255,0.6));
+  font-size: clamp(64px, 16vw, 96px);
+  color: #bf3b29;
+  filter: drop-shadow(0 0 20px rgba(191,59,41,0.7)) drop-shadow(0 0 4px rgba(212,160,23,0.4));
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  display: inline-block;
+  transform: rotate(-2deg);
 }
 .logo-title {
   font-family: var(--font-digit);
-  font-size: clamp(22px, 5vw, 34px);
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  background: var(--grad-btn);
+  font-size: clamp(26px, 6vw, 40px);
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  background: linear-gradient(135deg, #d4a017 0%, #f5ead0 55%, #d4a017 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1.15;
 }
 .logo-sub {
-  font-family: var(--font-digit);
-  font-size: 12px;
-  letter-spacing: 0.3em;
-  color: rgba(224,232,255,0.5);
-  margin-top: 2px;
-  text-transform: uppercase;
+  font-family: var(--font-main);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: rgba(212,160,23,0.65);
+  margin-top: 6px;
 }
 .logo-desc {
-  font-size: 14px;
-  color: rgba(224,232,255,0.55);
-  margin-top: 12px;
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  color: rgba(245,234,208,0.45);
+  margin-top: 8px;
+  letter-spacing: 0.08em;
 }
 
 /* 難易度選択 */
 .difficulty-section { width: 100%; }
 .section-label {
+  font-family: var(--font-main);
   font-size: 12px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(224,232,255,0.45);
+  letter-spacing: 0.25em;
+  color: rgba(212,160,23,0.55);
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .difficulty-cards {
   display: grid;
@@ -1114,24 +1120,23 @@ body { position: relative; }
 =================================================== */
 .global-footer {
   position: fixed;
-  bottom: 10px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 100;
+  z-index: 10;          /* Xボタンより低くして重複クリックを防止 */
   pointer-events: all;
 }
 .footer-link {
   display: block;
-  opacity: 0.35;
+  opacity: 0.28;
   transition: opacity 0.2s ease;
   line-height: 1;
 }
-.footer-link:hover { opacity: 0.75; }
+.footer-link:hover { opacity: 0.62; }
 .footer-logo {
-  width: 320px;
-  max-width: 90vw;
+  width: 180px;         /* 控えめサイズでXボタンと重ならない */
+  max-width: 55vw;
   height: auto;
   display: block;
-  filter: grayscale(1) brightness(2);
+  filter: grayscale(1) brightness(1.8);
 }
-
