@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>素数マスター | Prime Master</title>
+  <meta name="description" content="タイムアタック形式で素数を判定！60秒以内にいくつ正解できる？難易度別ランキングで腕試し。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 星のパーティクル背景 -->
+  <div id="stars-container" aria-hidden="true"></div>
+
+  <!-- ========== トップ画面 ========== -->
+  <div id="screen-home" class="screen active">
+    <div class="home-container">
+      <div class="logo-area">
+        <div class="logo-icon">∑</div>
+        <h1 class="logo-title">素数マスター</h1>
+        <p class="logo-sub">Prime Master</p>
+        <p class="logo-desc">60秒タイムアタック — あなたは素数を見抜けるか？</p>
+      </div>
+
+      <div class="difficulty-section">
+        <h2 class="section-label">難易度を選択</h2>
+        <div class="difficulty-cards">
+          <button class="diff-card" id="diff-2" data-diff="2" aria-label="2桁難易度を選択">
+            <div class="diff-badge">EASY</div>
+            <div class="diff-digits">2桁</div>
+            <div class="diff-range">10 〜 99</div>
+            <div class="diff-count">素数 21個</div>
+          </button>
+          <button class="diff-card" id="diff-3" data-diff="3" aria-label="3桁難易度を選択">
+            <div class="diff-badge medium">NORMAL</div>
+            <div class="diff-digits">3桁</div>
+            <div class="diff-range">100 〜 999</div>
+            <div class="diff-count">素数 143個</div>
+          </button>
+          <button class="diff-card" id="diff-4" data-diff="4" aria-label="4桁難易度を選択">
+            <div class="diff-badge hard">HARD</div>
+            <div class="diff-digits">4桁</div>
+            <div class="diff-range">1000 〜 9999</div>
+            <div class="diff-count">素数 1061個</div>
+          </button>
+        </div>
+      </div>
+
+      <button id="btn-start" class="btn-primary" disabled aria-label="ゲームを開始する">
+        <span class="btn-icon">▶</span> ゲームスタート
+      </button>
+
+      <div class="home-sub-buttons">
+        <button id="btn-ranking-home" class="btn-secondary btn-half" aria-label="ランキングを見る">
+          🏆 ランキング
+        </button>
+        <button id="btn-primelist-home" class="btn-secondary btn-half" aria-label="素数一覧を見る">
+          📚 素数一覧
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== カウントダウン画面 ========== -->
+  <div id="screen-countdown" class="screen">
+    <div class="countdown-container">
+      <div class="countdown-label">Ready...</div>
+      <div id="countdown-number" class="countdown-number">3</div>
+      <div id="countdown-diff-display" class="countdown-diff"></div>
+    </div>
+  </div>
+
+  <!-- ========== ゲーム画面 ========== -->
+  <div id="screen-game" class="screen">
+    <div class="game-container">
+      <!-- HUD -->
+      <div class="game-hud">
+        <div class="hud-item">
+          <span class="hud-label">正解</span>
+          <span id="hud-correct" class="hud-val correct-val">0</span>
+        </div>
+        <div class="hud-timer-wrap">
+          <div class="timer-bar-wrap">
+            <div id="timer-bar" class="timer-bar"></div>
+          </div>
+          <div id="hud-time" class="hud-time">60</div>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">不正解</span>
+          <span id="hud-wrong" class="hud-val wrong-val">0</span>
+        </div>
+      </div>
+
+      <!-- 問題エリア -->
+      <div id="question-area" class="question-area">
+        <div class="question-label">この数は素数？</div>
+        <div id="question-number" class="question-number">--</div>
+        <div id="feedback-overlay" class="feedback-overlay" aria-hidden="true"></div>
+      </div>
+
+      <!-- 回答ボタン -->
+      <div class="answer-buttons">
+        <button id="btn-prime" class="btn-answer prime-btn" aria-label="素数である">
+          <span class="answer-icon">✓</span>
+          <span class="answer-text">素数</span>
+        </button>
+        <button id="btn-not-prime" class="btn-answer not-prime-btn" aria-label="素数でない">
+          <span class="answer-icon">✕</span>
+          <span class="answer-text">素数でない</span>
+        </button>
+      </div>
+
+      <!-- 難易度バッジ -->
+      <div id="game-diff-badge" class="game-diff-badge"></div>
+    </div>
+
+    <!-- パーティクル -->
+    <div id="particles-container" aria-hidden="true"></div>
+  </div>
+
+  <!-- ========== 結果画面 ========== -->
+  <div id="screen-result" class="screen">
+    <div class="result-container">
+      <div class="result-header">
+        <div class="result-icon">🎯</div>
+        <h2 class="result-title">結果発表</h2>
+        <div id="result-diff-label" class="result-diff-badge"></div>
+      </div>
+
+      <div class="result-stats">
+        <div class="stat-card correct-stat">
+          <div class="stat-value" id="result-correct">0</div>
+          <div class="stat-label">正解</div>
+        </div>
+        <div class="stat-card wrong-stat">
+          <div class="stat-value" id="result-wrong">0</div>
+          <div class="stat-label">不正解</div>
+        </div>
+        <div class="stat-card rate-stat">
+          <div class="stat-value" id="result-rate">0%</div>
+          <div class="stat-label">正答率</div>
+        </div>
+      </div>
+
+      <!-- ペナルティスコア -->
+      <div class="penalty-score-section">
+        <div class="penalty-score-label">ランキングスコア</div>
+        <div id="result-penalty-score" class="penalty-score-value">--</div>
+        <div class="penalty-score-formula">正解数 − 不正解数</div>
+      </div>
+
+      <div id="score-alert" class="score-alert" style="display:none">
+        ⚠️ スコアが 0 以下のためランキングに登録できません
+      </div>
+
+      <div class="ranking-register">
+        <h3 class="register-label">ランキングに登録する</h3>
+        <div class="name-input-wrap">
+          <input
+            type="text"
+            id="input-name"
+            class="name-input"
+            maxlength="10"
+            placeholder="名前を入力（最大10文字）"
+            aria-label="ランキング用の名前"
+          />
+          <button id="btn-register" class="btn-register" aria-label="ランキングに登録">登録</button>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button id="btn-retry" class="btn-primary" aria-label="もう一度挑戦する">
+          🔄 再挑戦
+        </button>
+        <button id="btn-home-result" class="btn-secondary" aria-label="ホームに戻る">
+          🏠 ホームへ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ランキング画面 ========== -->
+  <div id="screen-ranking" class="screen">
+    <div class="ranking-container">
+      <div class="ranking-header">
+        <h2 class="ranking-title">🏆 ランキング</h2>
+      </div>
+
+      <!-- ⚠️ Render無料プランの注意バナー -->
+      <div class="server-notice" id="server-notice">
+        ⚠️ サーバー再起動時にデータがリセットされる場合があります（Render無料プランの制限）
+      </div>
+
+      <!-- 難易度タブ -->
+      <div class="ranking-tabs" role="tablist" aria-label="難易度選択">
+        <button class="rank-tab active" data-tab="2" role="tab" aria-selected="true" id="tab-2">2桁</button>
+        <button class="rank-tab" data-tab="3" role="tab" aria-selected="false" id="tab-3">3桁</button>
+        <button class="rank-tab" data-tab="4" role="tab" aria-selected="false" id="tab-4">4桁</button>
+      </div>
+
+      <!-- 期間タブ -->
+      <div class="period-tabs" role="tablist" aria-label="期間選択">
+        <button class="period-tab" data-period="today" role="tab" aria-selected="false" id="ptab-today">今日</button>
+        <button class="period-tab active" data-period="week" role="tab" aria-selected="true" id="ptab-week">今週</button>
+        <button class="period-tab" data-period="month" role="tab" aria-selected="false" id="ptab-month">今月</button>
+      </div>
+
+      <div id="ranking-list" class="ranking-list" role="list" aria-live="polite">
+        <!-- JSで生成 -->
+      </div>
+
+      <button id="btn-home-ranking" class="btn-secondary" aria-label="ホームに戻る">
+        🏠 ホームへ戻る
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== 素数一覧画面 ========== -->
+  <div id="screen-primelist" class="screen">
+    <div class="primelist-container">
+      <div class="primelist-header">
+        <h2 class="primelist-title">📚 素数一覧</h2>
+        <p class="primelist-desc">難易度別の素数をすべて表示します</p>
+      </div>
+
+      <div class="ranking-tabs" role="tablist">
+        <button class="rank-tab plist-tab active" data-plist="2" role="tab" aria-selected="true">
+          2桁 <span class="plist-count" id="pcount-2"></span>
+        </button>
+        <button class="rank-tab plist-tab" data-plist="3" role="tab" aria-selected="false">
+          3桁 <span class="plist-count" id="pcount-3"></span>
+        </button>
+        <button class="rank-tab plist-tab" data-plist="4" role="tab" aria-selected="false">
+          4桁 <span class="plist-count" id="pcount-4"></span>
+        </button>
+      </div>
+
+      <div id="primelist-grid" class="primelist-grid" role="list" aria-live="polite">
+        <!-- JSで生成 -->
+      </div>
+
+      <button id="btn-home-primelist" class="btn-secondary" aria-label="ホームに戻る">
+        🏠 ホームへ戻る
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
