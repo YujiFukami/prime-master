@@ -35,12 +35,37 @@ function isPrime(n) {
   return true;
 }
 
+// ===================================================
+// タスク2: 素因数分解
+// ===================================================
+function factorize(n) {
+  const factors = [];
+  let d = 2;
+  while (d * d <= n) {
+    while (n % d === 0) { factors.push(d); n = Math.floor(n / d); }
+    d++;
+  }
+  if (n > 1) factors.push(n);
+  return factors;
+}
+
+function factorizeStr(n) {
+  return factorize(n).join(' × ');
+}
+
+// ===================================================
 // 難易度に応じた範囲の素数・非素数リストを事前生成
-function buildNumberPool(diff) {
-  const { min, max } = DIFFICULTY_CONFIG[diff];
-  const primes     = [];
-  const nonPrimes  = [];
+// タスク1: state.rangeMin/rangeMax を使用
+// タスク3: state.excludeEven でフィルタ
+// ===================================================
+function buildNumberPool() {
+  const min = state.rangeMin;
+  const max = state.rangeMax;
+  const primes    = [];
+  const nonPrimes = [];
   for (let n = min; n <= max; n++) {
+    // タスク3: 偶数除外（2自体はそのまま通す）
+    if (state.excludeEven && n !== 2 && n % 2 === 0) continue;
     (isPrime(n) ? primes : nonPrimes).push(n);
   }
   return { primes, nonPrimes };
@@ -201,21 +226,27 @@ const SFX = (() => {
 // ゲーム状態
 // ===================================================
 const state = {
-  screen:       'home',   // home | countdown | game | result | ranking
-  difficulty:   null,     // 2 | 3 | 4
-  score:        0,
-  wrong:        0,
-  timeLeft:     GAME_DURATION,
+  screen:        'home',   // home | countdown | game | result | ranking
+  difficulty:    null,     // 2 | 3 | 4
+  score:         0,
+  wrong:         0,
+  timeLeft:      GAME_DURATION,
   timerInterval: null,
-  queue:        [],
-  queueIndex:   0,
-  currentNum:   null,
-  lastNum:      null,
-  pool:         null,
-  isAnswering:  false,    // 連打防止
-  myScoreIndex: -1,       // 結果画面→ランキング時のハイライト
-  penaltyScore: 0,        // ランキング登録スコア（正解数−不正解数）
-  rankPeriod:   'week',   // today | week | month
+  queue:         [],
+  queueIndex:    0,
+  currentNum:    null,
+  lastNum:       null,
+  pool:          null,
+  isAnswering:   false,    // 連打防止
+  myScoreIndex:  -1,       // 結果画面→ランキング時のハイライト
+  penaltyScore:  0,        // ランキング登録スコア（正解数−不正解数）
+  rankPeriod:    'week',   // today | week | month
+  // タスク1: カスタム範囲
+  rangeMin:      10,
+  rangeMax:      99,
+  isCustomRange: false,    // デフォルト範囲から変更されたか
+  // タスク3: 偶数除外
+  excludeEven:   false,
 };
 
 // ===================================================
@@ -273,11 +304,59 @@ function initMuteButton() {
 }
 
 // ===================================================
+// タスク1+3: 範囲設定UIの更新
+// ===================================================
+function updateRangeUI() {
+  const diff = state.difficulty;
+  if (!diff) return;
+
+  const cfg    = DIFFICULTY_CONFIG[diff];
+  const minEl  = document.getElementById('range-min');
+  const maxEl  = document.getElementById('range-max');
+  const errEl  = document.getElementById('range-error');
+  const cntEl  = document.getElementById('range-prime-count');
+  const notice = document.getElementById('custom-range-notice');
+
+  // 入力値を取得（デフォルトは難易度の全範囲）
+  const rMin = parseInt(minEl.value, 10);
+  const rMax = parseInt(maxEl.value, 10);
+
+  errEl.style.display = 'none';
+
+  // バリデーション
+  if (isNaN(rMin) || isNaN(rMax)) { errEl.textContent = '数値を入力してください'; errEl.style.display = 'block'; return; }
+  if (rMin < cfg.min || rMax > cfg.max) { errEl.textContent = `範囲は ${cfg.min} 〜 ${cfg.max} の間で指定してください`; errEl.style.display = 'block'; return; }
+  if (rMin >= rMax) { errEl.textContent = '最小値は最大値より小さくしてください'; errEl.style.display = 'block'; return; }
+
+  // 素数個数を計算してプレビュー表示
+  let cnt = 0;
+  const excEven = document.getElementById('chk-exclude-even').checked;
+  for (let n = rMin; n <= rMax; n++) {
+    if (excEven && n !== 2 && n % 2 === 0) continue;
+    if (isPrime(n)) cnt++;
+  }
+  if (cnt === 0) { errEl.textContent = 'この範囲に素数がありません。範囲を広げてください'; errEl.style.display = 'block'; return; }
+
+  cntEl.textContent = `この範囲の素数: ${cnt}個`;
+
+  // カスタム範囲かどうか判定
+  const isCustom = (rMin !== cfg.min || rMax !== cfg.max);
+  state.rangeMin      = rMin;
+  state.rangeMax      = rMax;
+  state.isCustomRange = isCustom;
+  notice.style.display = isCustom ? 'block' : 'none';
+}
+
+// ===================================================
 // トップ画面
 // ===================================================
 function initHome() {
-  const cards   = document.querySelectorAll('.diff-card');
+  const cards    = document.querySelectorAll('.diff-card');
   const btnStart = document.getElementById('btn-start');
+  const settings = document.getElementById('game-settings');
+  const minEl    = document.getElementById('range-min');
+  const maxEl    = document.getElementById('range-max');
+  const chkEven  = document.getElementById('chk-exclude-even');
 
   cards.forEach(card => {
     card.addEventListener('click', () => {
@@ -286,11 +365,35 @@ function initHome() {
       state.difficulty = parseInt(card.dataset.diff, 10);
       btnStart.disabled = false;
       SFX.click();
+
+      // 設定パネルを表示し、入力欄をデフォルト値にリセット
+      const cfg = DIFFICULTY_CONFIG[state.difficulty];
+      minEl.min   = cfg.min;  minEl.max = cfg.max;  minEl.value = cfg.min;
+      maxEl.min   = cfg.min;  maxEl.max = cfg.max;  maxEl.value = cfg.max;
+      state.rangeMin      = cfg.min;
+      state.rangeMax      = cfg.max;
+      state.isCustomRange = false;
+      document.getElementById('custom-range-notice').style.display = 'none';
+      document.getElementById('range-error').style.display = 'none';
+      document.getElementById('range-prime-count').textContent = '';
+      settings.style.display = 'block';
+      updateRangeUI();
     });
+  });
+
+  // 範囲入力イベント
+  minEl.addEventListener('input', updateRangeUI);
+  maxEl.addEventListener('input', updateRangeUI);
+  chkEven.addEventListener('change', () => {
+    state.excludeEven = chkEven.checked;
+    updateRangeUI();
   });
 
   btnStart.addEventListener('click', () => {
     if (!state.difficulty) return;
+    // バリデーション再チェック
+    const errEl = document.getElementById('range-error');
+    if (errEl.style.display === 'block') { SFX.wrong(); return; }
     SFX.click();
     startCountdown();
   });
@@ -330,7 +433,11 @@ function startCountdown() {
   const numEl  = document.getElementById('countdown-number');
   const diffEl = document.getElementById('countdown-diff-display');
   const diff   = state.difficulty;
-  diffEl.textContent = `難易度：${DIFFICULTY_CONFIG[diff].label} (${DIFFICULTY_CONFIG[diff].badge})`;
+  const cfg    = DIFFICULTY_CONFIG[diff];
+  const rangeLabel = state.isCustomRange
+    ? ` / ${state.rangeMin}〜${state.rangeMax}`
+    : '';
+  diffEl.textContent = `難易度：${cfg.label} (${cfg.badge})${rangeLabel}`;
 
   let count = COUNTDOWN_SEC;
   numEl.textContent = count;
@@ -369,7 +476,7 @@ function startGame() {
   state.wrong        = 0;
   state.timeLeft     = GAME_DURATION;
   state.isAnswering  = false;
-  state.pool         = buildNumberPool(state.difficulty);
+  state.pool         = buildNumberPool();   // タスク1+3: state.rangeMin/Max・excludeEven を使用
   state.queue        = buildQueue(state.pool, 300);
   state.queueIndex   = 0;
   state.currentNum   = null;
@@ -382,8 +489,10 @@ function startGame() {
   document.getElementById('hud-time').classList.remove('danger');
   document.getElementById('timer-bar').style.width   = '100%';
   document.getElementById('timer-bar').classList.remove('danger');
+  const cfg = DIFFICULTY_CONFIG[state.difficulty];
+  const rangeLabel = state.isCustomRange ? ` (${state.rangeMin}〜${state.rangeMax})` : '';
   document.getElementById('game-diff-badge').textContent =
-    `難易度：${DIFFICULTY_CONFIG[state.difficulty].label}`;
+    `難易度：${cfg.label}${rangeLabel}`;
 
   showScreen('game');
   nextQuestion();
@@ -449,11 +558,13 @@ function handleAnswer(userSaysPrime) {
   if (state.isAnswering || state.timeLeft <= 0) return;
   state.isAnswering = true;
 
-  const correct = isPrime(state.currentNum);
+  const num     = state.currentNum;
+  const correct = isPrime(num);
   const isRight = (userSaysPrime === correct);
 
   const area    = document.getElementById('question-area');
   const overlay = document.getElementById('feedback-overlay');
+  const factEl  = document.getElementById('factorization-display');
 
   if (isRight) {
     state.score++;
@@ -472,13 +583,24 @@ function handleAnswer(userSaysPrime) {
     SFX.wrong();
   }
 
+  // タスク2: 非素数のとき素因数分解を表示
+  if (!correct) {
+    factEl.textContent = `${num} = ${factorizeStr(num)}`;
+    factEl.classList.add('visible');
+  } else {
+    factEl.textContent = '';
+    factEl.classList.remove('visible');
+  }
+
   setTimeout(() => {
     area.classList.remove('correct-flash', 'wrong-shake');
     overlay.className  = 'feedback-overlay';
     overlay.textContent = '';
+    factEl.textContent  = '';
+    factEl.classList.remove('visible');
     state.isAnswering   = false;
     if (state.timeLeft > 0) nextQuestion();
-  }, 350);
+  }, 600);
 }
 
 // ===================================================
@@ -531,23 +653,31 @@ function endGame() {
   document.getElementById('result-correct').textContent = state.score;
   document.getElementById('result-wrong').textContent   = state.wrong;
   document.getElementById('result-rate').textContent    = `${rate}%`;
+  const cfg = DIFFICULTY_CONFIG[state.difficulty];
+  const rangeLabel = state.isCustomRange ? ` / ${state.rangeMin}〜${state.rangeMax}` : '';
   document.getElementById('result-diff-label').textContent =
-    `${DIFFICULTY_CONFIG[state.difficulty].label}（${DIFFICULTY_CONFIG[state.difficulty].badge}）`;
+    `${cfg.label}（${cfg.badge}）${rangeLabel}`;
 
   // ペナルティスコア表示
   const psEl = document.getElementById('result-penalty-score');
   psEl.textContent = penaltyScore;
   psEl.style.color = penaltyScore > 0 ? 'var(--accent-cyan)' : 'var(--wrong-red)';
 
-  // 登録可否制御（スコア1以上が必須）
+  // タスク1: カスタム範囲 or スコア0以下 → ランキング登録不可
   const alertEl    = document.getElementById('score-alert');
   const regSection = document.querySelector('.ranking-register');
   if (penaltyScore <= 0) {
-    alertEl.style.display       = 'block';
+    alertEl.textContent          = '⚠️ スコアが 0 以下のためランキングに登録できません';
+    alertEl.style.display        = 'block';
+    regSection.style.opacity       = '0.4';
+    regSection.style.pointerEvents = 'none';
+  } else if (state.isCustomRange) {
+    alertEl.textContent          = '📐 カスタム範囲でのプレイはランキングに登録できません';
+    alertEl.style.display        = 'block';
     regSection.style.opacity       = '0.4';
     regSection.style.pointerEvents = 'none';
   } else {
-    alertEl.style.display       = 'none';
+    alertEl.style.display        = 'none';
     regSection.style.opacity       = '1';
     regSection.style.pointerEvents = '';
   }

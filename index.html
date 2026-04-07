@@ -48,6 +48,32 @@
         </div>
       </div>
 
+      <!-- ゲーム設定パネル（難易度選択後に表示） -->
+      <div id="game-settings" class="game-settings" aria-label="ゲーム設定" style="display:none">
+        <!-- タスク1: 出題範囲 -->
+        <div class="setting-row">
+          <span class="setting-label">📐 出題範囲</span>
+          <div class="range-inputs">
+            <input type="number" id="range-min" class="range-input" aria-label="最小値" />
+            <span class="range-sep">〜</span>
+            <input type="number" id="range-max" class="range-input" aria-label="最大値" />
+          </div>
+        </div>
+        <div id="range-error" class="range-error" style="display:none" role="alert"></div>
+        <div id="range-prime-count" class="range-prime-count"></div>
+
+        <!-- タスク3: 偶数除外チェックボックス -->
+        <label class="setting-row setting-check" for="chk-exclude-even">
+          <input type="checkbox" id="chk-exclude-even" class="check-input" aria-label="偶数を出題から除外する" />
+          <span class="check-label">⚡ 偶数を除外する（一の位が 0,2,4,6,8 の数）</span>
+        </label>
+
+        <!-- カスタム範囲時のランキング不可警告 -->
+        <div id="custom-range-notice" class="custom-range-notice" style="display:none">
+          ⚠️ カスタム範囲ではランキング登録できません
+        </div>
+      </div>
+
       <button id="btn-start" class="btn-primary" disabled aria-label="ゲームを開始する">
         <span class="btn-icon">▶</span> ゲームスタート
       </button>
@@ -103,6 +129,8 @@
       <div id="question-area" class="question-area">
         <div class="question-label">この数は素数？</div>
         <div id="question-number" class="question-number">--</div>
+        <!-- タスク2: 素因数分解表示エリア -->
+        <div id="factorization-display" class="factorization-display" aria-live="polite"></div>
         <div id="feedback-overlay" class="feedback-overlay" aria-hidden="true"></div>
       </div>
 

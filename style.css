@@ -1140,3 +1140,165 @@ body {
   display: block;
   filter: grayscale(1) brightness(1.8);
 }
+
+/* ===================================================
+   タスク1+3: ゲーム設定パネル（トップ画面）
+=================================================== */
+.game-settings {
+  width: 100%;
+  background: rgba(212,160,23,0.05);
+  border: 1.5px solid rgba(212,160,23,0.2);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.setting-label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: rgba(212,160,23,0.75);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 範囲入力 */
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+}
+.range-input {
+  width: 90px;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(212,160,23,0.3);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  color: #f5ead0;
+  font-family: var(--font-digit);
+  font-size: 15px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s ease;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.range-input::-webkit-inner-spin-button,
+.range-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.range-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px rgba(212,160,23,0.15); }
+.range-sep {
+  font-size: 14px;
+  color: rgba(245,234,208,0.4);
+  flex-shrink: 0;
+}
+
+.range-error {
+  font-size: 11px;
+  color: var(--wrong-red);
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 4px 0;
+  animation: alertPulse 1.5s ease infinite;
+}
+
+.range-prime-count {
+  font-size: 11px;
+  color: rgba(212,160,23,0.6);
+  text-align: center;
+  letter-spacing: 0.06em;
+  min-height: 16px;
+}
+
+/* タスク3: チェックボックス */
+.setting-check {
+  cursor: pointer;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.check-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(212,160,23,0.4);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.check-input:checked {
+  background: rgba(212,160,23,0.3);
+  border-color: var(--accent-gold);
+}
+.check-input:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: var(--accent-gold);
+  font-weight: 900;
+  line-height: 1;
+}
+.check-label {
+  font-size: 12px;
+  color: rgba(245,234,208,0.65);
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+.setting-check:hover .check-label { color: rgba(245,234,208,0.9); }
+
+/* カスタム範囲時の警告 */
+.custom-range-notice {
+  font-size: 11px;
+  color: rgba(212,160,23,0.75);
+  text-align: center;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+  border: 1px solid rgba(212,160,23,0.25);
+  border-radius: var(--radius-sm);
+  background: rgba(212,160,23,0.05);
+}
+
+/* ===================================================
+   タスク2: 素因数分解表示（ゲーム画面）
+=================================================== */
+.factorization-display {
+  font-family: var(--font-digit);
+  font-size: clamp(12px, 3vw, 16px);
+  color: rgba(191,59,41,0.9);
+  letter-spacing: 0.05em;
+  margin-top: 8px;
+  min-height: 22px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+.factorization-display.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .range-input { width: 74px; font-size: 13px; padding: 6px 6px; }
+  .setting-label { font-size: 11px; }
+  .check-label { font-size: 11px; }
+}
